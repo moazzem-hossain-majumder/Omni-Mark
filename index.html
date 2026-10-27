@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OmniMark — Pro Markdown Studio & Live Reader</title>
+  <meta name="description" content="Ultra-sleek, split-pane Markdown reader and live editor featuring callout alerts, syntax-highlighted code cards, KaTeX math, and Mermaid diagrams.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- KaTeX Math CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css">
+
+  <!-- Highlight.js Theme -->
+  <link id="hljs-theme" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+
+  <!-- Main Application CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="obsidian">
+
+  <div class="app-container">
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+      <div class="brand-section">
+        <div class="logo-badge" title="OmniMark">
+          <!-- Markdown logo SVG -->
+          <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M14.85 3H1.15C.52 3 0 3.52 0 4.15v7.69C0 12.48.52 13 1.15 13h13.69c.64 0 1.15-.52 1.15-1.15v-7.7C16 3.52 15.48 3 14.85 3zM9 11H7V8L5.5 9.9 4 8v3H2V5h2l1.5 2L7 5h2v6zm2.99.5L9.5 8H11V5h2v3h1.5l-2.51 3.5z"/>
+          </svg>
+        </div>
+        <span class="brand-title">
+          OmniMark
+          <span class="brand-tag">Studio Pro</span>
+        </span>
+      </div>
+
+      <!-- Center: Layout View Modes -->
+      <div class="view-mode-tabs" role="tablist">
+        <button id="mode-split-btn" class="tab-btn active" role="tab" title="Split Screen (Editor & Reader)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <path d="M12 3v18"/>
+          </svg>
+          Split
+        </button>
+        <button id="mode-editor-btn" class="tab-btn" role="tab" title="Editor Only">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <path d="M9 3v18"/>
+          </svg>
+          Editor Only
+        </button>
+        <button id="mode-reader-btn" class="tab-btn" role="tab" title="Reader Only (Distraction-Free)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <path d="M15 3v18"/>
+          </svg>
+          Reader Only
+        </button>
+      </div>
+
+      <!-- Right Header Actions -->
+      <div class="header-actions">
+        <!-- Theme Selector -->
+        <div class="theme-select-wrapper">
+          <select id="theme-selector" class="theme-select" aria-label="Select Theme">
+            <option value="obsidian">Obsidian Dark</option>
+            <option value="deep-navy">Deep Navy</option>
+            <option value="warm-espresso">Warm Espresso</option>
+            <option value="ivory-parchment">Ivory Parchment</option>
+            <option value="pure-light">Pure Light</option>
+          </select>
+          <svg class="theme-select-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </div>
+
+        <!-- Sync Scroll Button -->
+        <button id="sync-scroll-btn" class="btn-icon active" data-tooltip="Synchronized Scroll: ON" aria-label="Toggle Sync Scroll">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m3 16 4 4 4-4"/>
+            <path d="M7 20V4"/>
+            <path d="m21 8-4-4-4 4"/>
+            <path d="M17 4v16"/>
+          </svg>
+        </button>
+
+        <!-- Table of Contents Toggle -->
+        <button id="toggle-toc-btn" class="btn-icon" data-tooltip="Table of Contents" aria-label="Toggle TOC">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="8" y1="6" x2="21" y2="6"/>
+            <line x1="8" y1="12" x2="21" y2="12"/>
+            <line x1="8" y1="18" x2="21" y2="18"/>
+            <line x1="3" y1="6" x2="3.01" y2="6"/>
+            <line x1="3" y1="12" x2="3.01" y2="12"/>
+            <line x1="3" y1="18" x2="3.01" y2="18"/>
+          </svg>
+        </button>
+
+        <!-- Load Sample -->
+        <button id="load-sample-btn" class="btn-secondary" title="Load rich demo markdown">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+            <path d="M6 6h10"/>
+            <path d="M6 10h10"/>
+          </svg>
+          Sample
+        </button>
+
+        <!-- Clear Button -->
+        <button id="clear-btn" class="btn-secondary" title="Clear Editor">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 6h18"/>
+            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+          </svg>
+          Clear
+        </button>
+
+        <!-- Copy Dropdown / Button -->
+        <button id="copy-markdown-btn" class="btn-secondary" data-tooltip="Copy raw Markdown" aria-label="Copy Markdown">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+          </svg>
+          Copy
+        </button>
+
+        <!-- Export Dropdown / Button -->
+        <button id="export-html-btn" class="btn-primary" title="Export HTML or Print PDF">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Export
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace Split Pane -->
+    <main class="workspace-wrapper" id="workspace">
+
+      <!-- LEFT PANE: Uploader & Markdown Code Editor -->
+      <section class="editor-pane" id="editor-pane">
+        <!-- Editor Sub-Toolbar -->
+        <div class="pane-toolbar">
+          <div class="pane-title">
+            <span>Editor</span>
+            <span class="active-file-pill" id="file-name-badge">sample.md</span>
+          </div>
+
+          <!-- Quick Markdown Formatting Helpers -->
+          <div class="formatting-toolbar">
+            <button class="fmt-btn" id="fmt-bold" title="Bold (Ctrl+B)"><b>B</b></button>
+            <button class="fmt-btn" id="fmt-italic" title="Italic (Ctrl+I)"><i>I</i></button>
+            <button class="fmt-btn" id="fmt-strike" title="Strikethrough"><s>S</s></button>
+            <div class="toolbar-divider"></div>
+            <button class="fmt-btn" id="fmt-h1" title="Heading 1">H1</button>
+            <button class="fmt-btn" id="fmt-h2" title="Heading 2">H2</button>
+            <button class="fmt-btn" id="fmt-h3" title="Heading 3">H3</button>
+            <div class="toolbar-divider"></div>
+            <button class="fmt-btn" id="fmt-quote" title="Quote">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/>
+                <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/>
+              </svg>
+            </button>
+            <button class="fmt-btn" id="fmt-code" title="Inline Code">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="16 18 22 12 16 6"/>
+                <polyline points="8 6 2 12 8 18"/>
+              </svg>
+            </button>
+            <button class="fmt-btn" id="fmt-codeblock" title="Code Block">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="18" rx="2"/>
+                <path d="m10 10-2 2 2 2"/>
+                <path d="m14 10 2 2-2 2"/>
+              </svg>
+            </button>
+            <button class="fmt-btn" id="fmt-link" title="Link (Ctrl+K)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+              </svg>
+            </button>
+            <button class="fmt-btn" id="fmt-table" title="Insert Table">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect width="18" height="18" x="3" y="3" rx="2"/>
+                <path d="M3 9h18"/>
+                <path d="M3 15h18"/>
+                <path d="M9 3v18"/>
+                <path d="M15 3v18"/>
+              </svg>
+            </button>
+            <button class="fmt-btn" id="fmt-task" title="Insert Task List">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m9 11 3 3L22 4"/>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+              </svg>
+            </button>
+            <button class="fmt-btn" id="fmt-alert" title="Insert Callout Alert">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Upload File Button -->
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <input type="file" id="file-input" accept=".md,.markdown,.mdown,.mkd,.txt" style="display: none;">
+            <button id="upload-trigger-btn" class="btn-secondary" style="padding: 4px 10px; font-size: 11px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              Upload .md
+            </button>
+          </div>
+        </div>
+
+        <!-- Editor Workspace Area with Drag & Drop Overlay -->
+        <div class="editor-body" id="editor-body">
+          <div class="dropzone-overlay" id="dropzone">
+            <svg class="dropzone-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>
+              <path d="M12 12v9"/>
+              <path d="m16 16-4-4-4 4"/>
+            </svg>
+            <div class="dropzone-title">Drop your Markdown file here</div>
+            <div class="dropzone-subtitle">Supports .md, .markdown, or .txt files</div>
+          </div>
+
+          <div class="editor-container">
+            <div class="line-numbers" id="line-numbers">1</div>
+            <textarea id="markdown-input" class="editor-textarea" placeholder="Paste your Markdown code here or drag & drop a .md file..." spellcheck="false"></textarea>
+          </div>
+        </div>
+
+        <!-- Editor Footer: Word & Char metrics -->
+        <footer class="pane-footer">
+          <div class="footer-stats">
+            <span id="stat-words">0 words</span>
+            <span>•</span>
+            <span id="stat-chars">0 characters</span>
+            <span>•</span>
+            <span id="stat-lines">1 line</span>
+          </div>
+          <div>UTF-8</div>
+        </footer>
+      </section>
+
+      <!-- Resizable Gutter / Divider -->
+      <div class="gutter" id="gutter" title="Drag to resize panels"></div>
+
+      <!-- RIGHT PANE: Modern Markdown Reader -->
+      <section class="reader-pane" id="reader-pane">
+        <!-- Reader Sub-Toolbar -->
+        <div class="pane-toolbar">
+          <div class="pane-title">
+            <span>Reader Preview</span>
+            <span class="active-file-pill" id="reader-theme-pill">Obsidian Dark</span>
+          </div>
+
+          <!-- Document Search & Reading Stats -->
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="reader-search-box">
+              <svg class="search-icon-pos" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.3-4.3"/>
+              </svg>
+              <input type="text" id="reader-search-input" class="reader-search-input" placeholder="Find in document..." />
+            </div>
+
+            <span id="stat-read-time" style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); white-space: nowrap;">
+              0 min read
+            </span>
+
+            <!-- Reader Zen / Maximize -->
+            <button id="zen-reader-btn" class="btn-icon" data-tooltip="Maximize Reader" style="width: 28px; height: 28px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 3h6v6"/>
+                <path d="M9 21H3v-6"/>
+                <path d="M21 3l-7 7"/>
+                <path d="M3 21l7-7"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Rendered Markdown Body -->
+        <div class="reader-body" id="reader-body">
+          <article class="markdown-body" id="markdown-output">
+            <!-- Rendered Markdown Content injected here -->
+          </article>
+        </div>
+
+        <!-- Reader Footer -->
+        <footer class="pane-footer">
+          <div>Render Engine: Markdown + KaTeX + Mermaid</div>
+          <div id="stat-headings">0 Headings</div>
+        </footer>
+
+        <!-- Table of Contents Sliding Drawer -->
+        <aside class="toc-drawer" id="toc-drawer">
+          <div class="toc-header">
+            <span>Table of Contents</span>
+            <button id="close-toc-btn" class="btn-icon" style="width: 28px; height: 28px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+          <ul class="toc-list" id="toc-list">
+            <!-- Headings populated dynamically -->
+          </ul>
+        </aside>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- External High Performance Libraries -->
+  <!-- Marked.js -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <!-- Highlight.js -->
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+  <!-- Highlight.js Languages -->
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/typescript.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/python.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/rust.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/bash.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/json.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/sql.min.js"></script>
+  <!-- KaTeX -->
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
+  <!-- Mermaid.js -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+  <!-- DOMPurify -->
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.2/dist/purify.min.js"></script>
+
+  <!-- Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>

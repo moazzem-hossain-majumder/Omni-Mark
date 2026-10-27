@@ -1,0 +1,21 @@
+{
+  "name": "omnimark",
+  "version": "1.0.0",
+  "description": "A high-fidelity modern Markdown Reader, Live Editor, and Studio",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx -y serve . -l 5173",
+    "dev": "npx -y serve . -l 5173",
+    "build": "echo 'Ready for deployment'"
+  },
+  "keywords": [
+    "markdown",
+    "reader",
+    "studio",
+    "editor",
+    "katex",
+    "mermaid"
+  ],
+  "author": "",
+  "license": "MIT"
+}
