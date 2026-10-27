@@ -5,8 +5,7 @@
   "main": "index.html",
   "scripts": {
     "start": "npx -y serve . -l 5173",
-    "dev": "npx -y serve . -l 5173",
-    "build": "echo 'Ready for deployment'"
+    "dev": "npx -y serve . -l 5173"
   },
   "keywords": [
     "markdown",
