@@ -1,122 +1,119 @@
-# Welcome to OmniMark 🚀
-### Modern Markdown Studio & High-Fidelity Reader
+# OmniMark Parser Specification & Reference Document
 
-OmniMark is a distraction-free, reactive dual-pane Markdown environment. Upload your `.md` files or paste raw markdown code on the left to immediately inspect the live rendered output on the right.
-
----
-
-## ⚡ Feature Matrix
-
-| Capability | Standard Mode | Studio Pro Mode | OmniMark Engine |
-| :--- | :---: | :---: | :---: |
-| **Interactive Callouts** | Regular quotes | `[!NOTE]`, `[!TIP]`, etc. | 💎 Custom accent badges |
-| **Code Block Cards** | Plain background | Top bar + 1-Click Copy | ⚡ Highlight.js + line badges |
-| **Mermaid Diagrams** | Text block | Vector SVG diagrams | 📊 Real-time SVG rendering |
-| **Mathematical Formulas** | Raw LaTeX | KaTeX rendered notation | 🧮 Fast equation engine |
-| **Document Outline** | Manual | Interactive TOC Drawer | 📑 Live heading observer |
-| **Color Palettes** | Single theme | 5 Curated Studio Themes | 🎨 Obsidian, Navy, Espresso, etc. |
+OmniMark is a client-side Markdown editor and real-time document preview engine. It parses CommonMark and GitHub Flavored Markdown (GFM) in browser memory with zero network dependencies. The compiler evaluates block and inline LaTeX mathematics via KaTeX, compiles diagram DSL into inline SVG vectors via Mermaid.js, tokenizes source code blocks via Highlight.js, and sanitizes output through DOMPurify.
 
 ---
 
-## 🔔 Callout Alerts & Notifications
+## 1. Compiler Architecture & Pipeline Stages
+
+| Pipeline Stage | Engine / Library | Input Format | Output Artifact |
+| :--- | :--- | :--- | :--- |
+| Lexical & Block Tokenization | Marked.js 12.0.2 | Raw Markdown (`.md`, `.txt`) | HTML5 Semantic AST |
+| Mathematical Notation | KaTeX 0.16.10 | TeX / LaTeX (`$...$`, `$$...$$`) | MathML & HTML Spans |
+| Code Syntax Tokenization | Highlight.js 11.9.0 | Polyglot source blocks | Scoped token classes |
+| Diagram Compilation | Mermaid.js 10.9.1 | Graph / sequence DSL | Inline SVG vector nodes |
+| HTML Sanitization | DOMPurify 3.1.2 | Raw compiler output | Safe DOM tree |
+
+---
+
+## 2. Callout Alert Blocks
+
+The parser isolates blockquotes matching `> [!TYPE]` headers and transforms them into semantic alert containers before DOM insertion:
 
 > [!NOTE]
-> Useful context and background details that readers can quickly reference.
+> Background context and reference details for system operation.
 
 > [!TIP]
-> Helpful advice for productivity. Try dragging and dropping any `.md` file onto the left-hand editor!
+> Drag and drop any `.md` or `.txt` file onto the editor pane to load its contents into memory via the HTML5 FileReader API.
 
 > [!IMPORTANT]
-> Crucial information readers need to know to complete their tasks.
+> DOMPurify sanitizes the parsed HTML tree prior to insertion, stripping script injection vectors while preserving KaTeX MathML structures and Mermaid SVG nodes.
 
 > [!WARNING]
-> Urgent info requiring immediate attention to prevent unintended mistakes.
+> Unescaped dollar signs within code spans are preserved as literal text. For literal math delimiters in body text, escape with a backslash: `\$`.
 
 > [!CAUTION]
-> Highlights risk factors or negative outcomes of certain operations.
+> The editor buffer resides in browser session memory. Use the Export action to download standalone HTML before closing the browser session.
 
 ---
 
-## 🎨 5 Curated Color Themes
+## 3. Compiler Pipeline Flowchart
 
-OmniMark includes 5 hand-crafted themes accessible from the top toolbar:
-
-1. **Obsidian Dark**: Sleek deep dark mode with crisp borders and azure accents.
-2. **Deep Navy**: Rich oceanic navy blue with luminous sapphire and sky blue tones.
-3. **Warm Espresso**: Deep charcoal and volcanic stone with warm terracotta accents.
-4. **Ivory Parchment**: Clean warm cream paper finish designed for extended reading comfort.
-5. **Pure Light**: Minimalist daylight theme with crisp contrast and slate borders.
-
----
-
-## 📊 Live Interactive Mermaid Diagrams
-
-Any `mermaid` code block automatically renders into a vector graphic in real time:
+Mermaid code blocks automatically compile into scalable vector graphics in real time:
 
 ```mermaid
-graph TD
-    A[📄 Upload or Paste Markdown] --> B[⚡ Real-time AST Parser]
-    B --> C{Synthesizer}
-    C -->|Layout Engine| D[Tables & Checklists]
-    C -->|Code Engine| E[Syntax Highlighted Cards]
-    C -->|Mermaid Engine| F[Interactive Flowcharts]
-    C -->|KaTeX Engine| G[LaTeX Math Notation]
-    D & E & F & G --> H[🌟 Studio Reader View]
-    H --> I[📥 Instant Export to HTML / PDF / MD]
+graph LR
+    A[Input Buffer] --> B[KaTeX Token Extractor]
+    B --> C[Marked AST Compiler]
+    C --> D[DOMPurify Sanitizer]
+    D --> E[Highlight.js Tokenizer]
+    D --> F[Mermaid SVG Engine]
+    E & F --> G[Rendered DOM Tree]
+    G --> H[Standalone HTML Export]
 ```
 
 ---
 
-## 💻 Syntax Highlighted Code Cards
+## 4. Syntax Highlighted Code Blocks
 
-Code blocks feature language pills, formatted code, and a 1-click **Copy Code** button:
+Code blocks feature automatic language identification, atom token coloring, and one-click clipboard copying:
 
-```javascript
-// Reactive document telemetry and live state tracker
-class StudioEngine {
-  constructor(options = {}) {
-    this.theme = options.theme || 'deep-navy';
-    this.syncScroll = options.syncScroll ?? true;
-  }
-
-  process(markdownSource) {
-    console.log(`Processing ${markdownSource.length} characters in ${this.theme} mode...`);
-    return marked.parse(markdownSource);
-  }
+```typescript
+// Telemetry calculation for reading metrics
+interface DocumentMetrics {
+  words: number;
+  characters: number;
+  lines: number;
+  estimatedReadTimeMinutes: number;
 }
 
-const studio = new StudioEngine({ theme: 'deep-navy' });
-studio.process('# Welcome to OmniMark');
+export function computeDocumentMetrics(source: string): DocumentMetrics {
+  const characters = source.length;
+  const tokens = source.trim() ? source.trim().match(/\S+/g) || [] : [];
+  const words = tokens.length;
+  const lines = source.split('\n').length;
+  const estimatedReadTimeMinutes = Math.max(0.5, Math.ceil(words / 200));
+
+  return {
+    words,
+    characters,
+    lines,
+    estimatedReadTimeMinutes,
+  };
+}
 ```
 
 ```python
-import math
-from typing import List, Tuple
+import re
+from typing import Pattern
 
-def compute_reading_stats(content: str) -> Tuple[int, int, float]:
-    """Calculate word count, character count, and estimated reading time (minutes)."""
-    words: List[str] = content.split()
-    word_count: int = len(words)
-    char_count: int = len(content)
-    reading_time: float = round(word_count / 200.0, 1) # 200 wpm standard benchmark
-    return word_count, char_count, max(reading_time, 0.5)
+# Lexical anchor generator for heading navigation
+SLUG_CLEANER: Pattern[str] = re.compile(r"[^\w\s-]")
+WHITESPACE_SPLITTER: Pattern[str] = re.compile(r"[\s_-]+")
 
-print(compute_reading_stats("OmniMark provides real-time document telemetry!"))
+def slugify(heading_text: str) -> str:
+    """Generate a clean URL anchor from raw heading markdown."""
+    lowered = heading_text.lower().strip()
+    cleaned = SLUG_CLEANER.sub("", lowered)
+    slug = WHITESPACE_SPLITTER.sub("-", cleaned)
+    return slug.strip("-")
+
+assert slugify("Compiler Architecture & Pipeline") == "compiler-architecture-pipeline"
 ```
 
 ```rust
-// Memory-safe parser pipeline
-pub struct DocumentStats {
-    pub word_count: usize,
-    pub reading_time_mins: f32,
+// In-memory Markdown line-number indexer
+pub struct LineCounter {
+    pub line_count: usize,
+    pub total_bytes: usize,
 }
 
-impl DocumentStats {
-    pub fn new(text: &str) -> Self {
-        let count = text.split_whitespace().count();
+impl LineCounter {
+    pub fn from_buffer(buffer: &[u8]) -> Self {
+        let lines = buffer.iter().filter(|&&b| b == b'\n').count() + 1;
         Self {
-            word_count: count,
-            reading_time_mins: (count as f32 / 200.0).max(0.5),
+            line_count: lines,
+            total_bytes: buffer.len(),
         }
     }
 }
@@ -124,56 +121,48 @@ impl DocumentStats {
 
 ---
 
-## 🧮 KaTeX Mathematical Notation
+## 5. Mathematical Notation (KaTeX)
 
-Render scientific and mathematical formulas effortlessly:
+Inline and display mathematics are evaluated using the KaTeX rendering engine:
 
-Inline equation: The standard Gaussian distribution is given by $f(x) = \frac{1}{\sigma \sqrt{2\pi}} e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}$.
-
-Maxwell's differential equations of classical electromagnetism:
+The continuous Fourier Transform of an integrable function $f(x)$ is defined as:
 
 $$
-\begin{aligned}
-\nabla \cdot \mathbf{E} &= \frac{\rho}{\varepsilon_0} \\
-\nabla \cdot \mathbf{B} &= 0 \\
-\nabla \times \mathbf{E} &= -\frac{\partial \mathbf{B}}{\partial t} \\
-\nabla \times \mathbf{B} &= \mu_0 \left( \mathbf{J} + \varepsilon_0 \frac{\partial \mathbf{E}}{\partial t} \right)
-\end{aligned}
+\hat{f}(\xi) = \int_{-\infty}^{\infty} f(x) e^{-2\pi i x \xi} \, dx
+$$
+
+The standard normal probability density function with mean $\mu$ and standard deviation $\sigma$:
+
+$$
+f(x) = \frac{1}{\sigma \sqrt{2\pi}} \exp\left( -\frac{(x-\mu)^2}{2\sigma^2} \right)
 $$
 
 ---
 
-## ✅ Interactive Checklists & Task Lists
+## 6. Task Lists & Specification Checklists
 
-- [x] Responsive dual-pane editor with drag-and-drop file upload
-- [x] Modern reader pane with typography and custom scrollbars
-- [x] Rich alert callout blocks (`[!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]`, `[!CAUTION]`)
-- [x] Code blocks with header badges and 1-click copy
-- [x] Mathematical formula rendering via KaTeX
-- [x] Mermaid diagram vector rendering
-- [x] 5 Custom Studio themes including Deep Navy
-- [x] Synchronized split scrolling & resizable divider
-- [ ] Load your own markdown documents or take notes!
+- [x] Client-side CommonMark and GitHub Flavored Markdown parser
+- [x] KaTeX mathematical formula rendering engine
+- [x] Mermaid vector diagram dynamic compiler
+- [x] Syntax-highlighted code cards with one-click clipboard copying
+- [x] GFM callout alert transformations (`NOTE`, `TIP`, `IMPORTANT`, `WARNING`, `CAUTION`)
+- [x] Synchronized editor and preview split scrolling with resizable divider
+- [x] DOMPurify HTML security sanitization
+- [x] Standalone HTML document export
 
 ---
 
-## 📌 Typography, Quotes & Details
+## 7. Keyboard Shortcuts & Editor Conventions
 
-> "Simplicity is prerequisite for reliability."
-> — *Edsger W. Dijkstra*
-
-Keyboard shortcuts supported inside the editor:
-- <kbd>Ctrl</kbd> + <kbd>B</kbd> for **Bold**
-- <kbd>Ctrl</kbd> + <kbd>I</kbd> for *Italic*
-- <kbd>Ctrl</kbd> + <kbd>K</kbd> for [Hyperlink](https://example.com)
-- <kbd>Tab</kbd> to insert clean 2-space indentation
+| Action | Shortcut (macOS / Windows) | Behavior |
+| :--- | :--- | :--- |
+| **Bold** | `Cmd+B` / `Ctrl+B` | Wraps selection in `**` tokens |
+| **Italic** | `Cmd+I` / `Ctrl+I` | Wraps selection in `*` tokens |
+| **Hyperlink** | `Cmd+K` / `Ctrl+K` | Inserts `[text](url)` markdown pattern |
+| **Indentation** | `Tab` | Inserts 2 spaces at current cursor position |
 
 <details>
-<summary><b>Click to expand Auxiliary Documentation</b></summary>
+<summary>Technical Details: GFM Container Support</summary>
 
-Inside this collapsible panel, you can place supplementary technical notes, references, or changelogs. OmniMark handles nested markdown and HTML structures seamlessly.
+The rendering engine parses nested HTML `<details>` and `<summary>` elements according to CommonMark specifications, allowing technical disclosures, changelogs, and supplemental API schemas to be embedded directly within markdown source documents.
 </details>
-
----
-
-*Enjoy a clean, modern writing and reading experience with OmniMark!*

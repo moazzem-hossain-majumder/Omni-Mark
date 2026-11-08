@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OmniMark — Pro Markdown Studio & Live Reader</title>
-  <meta name="description" content="Ultra-sleek, split-pane Markdown reader and live editor featuring callout alerts, syntax-highlighted code cards, KaTeX math, and Mermaid diagrams.">
+  <title>OmniMark — Markdown Editor & Technical Document Previewer</title>
+  <meta name="description" content="Client-side Markdown editor and previewer with synchronized scrolling, KaTeX mathematics, Mermaid diagram compilation, and syntax highlighting.">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,34 +32,31 @@
             <path d="M14.85 3H1.15C.52 3 0 3.52 0 4.15v7.69C0 12.48.52 13 1.15 13h13.69c.64 0 1.15-.52 1.15-1.15v-7.7C16 3.52 15.48 3 14.85 3zM9 11H7V8L5.5 9.9 4 8v3H2V5h2l1.5 2L7 5h2v6zm2.99.5L9.5 8H11V5h2v3h1.5l-2.51 3.5z"/>
           </svg>
         </div>
-        <span class="brand-title">
-          OmniMark
-          <span class="brand-tag">Studio Pro</span>
-        </span>
+        <span class="brand-title">OmniMark</span>
       </div>
 
       <!-- Center: Layout View Modes -->
       <div class="view-mode-tabs" role="tablist">
-        <button id="mode-split-btn" class="tab-btn active" role="tab" title="Split Screen (Editor & Reader)">
+        <button id="mode-split-btn" class="tab-btn active" role="tab" title="Split view (editor and preview)">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="3" width="18" height="18" rx="2"/>
             <path d="M12 3v18"/>
           </svg>
           Split
         </button>
-        <button id="mode-editor-btn" class="tab-btn" role="tab" title="Editor Only">
+        <button id="mode-editor-btn" class="tab-btn" role="tab" title="Editor only">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="3" width="18" height="18" rx="2"/>
             <path d="M9 3v18"/>
           </svg>
-          Editor Only
+          Editor
         </button>
-        <button id="mode-reader-btn" class="tab-btn" role="tab" title="Reader Only (Distraction-Free)">
+        <button id="mode-reader-btn" class="tab-btn" role="tab" title="Preview only">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="3" width="18" height="18" rx="2"/>
             <path d="M15 3v18"/>
           </svg>
-          Reader Only
+          Preview
         </button>
       </div>
 
@@ -68,11 +65,11 @@
         <!-- Theme Selector -->
         <div class="theme-select-wrapper">
           <select id="theme-selector" class="theme-select" aria-label="Select Theme">
-            <option value="obsidian">Obsidian Dark</option>
-            <option value="deep-navy">Deep Navy</option>
-            <option value="warm-espresso">Warm Espresso</option>
-            <option value="ivory-parchment">Ivory Parchment</option>
-            <option value="pure-light">Pure Light</option>
+            <option value="obsidian">Obsidian (Dark)</option>
+            <option value="deep-navy">Slate (Dark)</option>
+            <option value="warm-espresso">Neutral (Dark)</option>
+            <option value="ivory-parchment">Parchment (Light)</option>
+            <option value="pure-light">Zinc (Light)</option>
           </select>
           <svg class="theme-select-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="m6 9 6 6 6-6"/>
@@ -102,7 +99,7 @@
         </button>
 
         <!-- Load Sample -->
-        <button id="load-sample-btn" class="btn-secondary" title="Load rich demo markdown">
+        <button id="load-sample-btn" class="btn-secondary" title="Load specification sample document">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
             <path d="M6 6h10"/>
@@ -112,7 +109,7 @@
         </button>
 
         <!-- Clear Button -->
-        <button id="clear-btn" class="btn-secondary" title="Clear Editor">
+        <button id="clear-btn" class="btn-secondary" title="Clear editor">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M3 6h18"/>
             <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
@@ -131,7 +128,7 @@
         </button>
 
         <!-- Export Dropdown / Button -->
-        <button id="export-html-btn" class="btn-primary" title="Export HTML or Print PDF">
+        <button id="export-html-btn" class="btn-primary" title="Export HTML document or print">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
             <polyline points="7 10 12 15 17 10"/>
@@ -266,8 +263,8 @@
         <!-- Reader Sub-Toolbar -->
         <div class="pane-toolbar">
           <div class="pane-title">
-            <span>Reader Preview</span>
-            <span class="active-file-pill" id="reader-theme-pill">Obsidian Dark</span>
+            <span>Preview</span>
+            <span class="active-file-pill" id="reader-theme-pill">Obsidian</span>
           </div>
 
           <!-- Document Search & Reading Stats -->
@@ -285,7 +282,7 @@
             </span>
 
             <!-- Reader Zen / Maximize -->
-            <button id="zen-reader-btn" class="btn-icon" data-tooltip="Maximize Reader" style="width: 28px; height: 28px;">
+            <button id="zen-reader-btn" class="btn-icon" data-tooltip="Maximize preview" style="width: 28px; height: 28px;">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M15 3h6v6"/>
                 <path d="M9 21H3v-6"/>
@@ -305,7 +302,7 @@
 
         <!-- Reader Footer -->
         <footer class="pane-footer">
-          <div>Render Engine: Markdown + KaTeX + Mermaid</div>
+          <div>Compiler: Marked 12 · KaTeX 0.16 · Mermaid 10</div>
           <div id="stat-headings">0 Headings</div>
         </footer>
 

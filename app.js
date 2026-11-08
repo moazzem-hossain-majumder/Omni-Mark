@@ -1,6 +1,6 @@
 /**
- * OmniMark — Pro Markdown Studio & Live Reader
- * High-performance, reactive dual-pane reader engine.
+ * OmniMark — Markdown Editor & Technical Document Previewer
+ * Client-side CommonMark and GFM compilation engine.
  */
 
 (function () {
@@ -8,11 +8,11 @@
 
   // --- Theme Name Mapping ---
   const THEME_NAMES = {
-    'obsidian': 'Obsidian Dark',
-    'deep-navy': 'Deep Navy',
-    'warm-espresso': 'Warm Espresso',
-    'ivory-parchment': 'Ivory Parchment',
-    'pure-light': 'Pure Light'
+    'obsidian': 'Obsidian',
+    'deep-navy': 'Slate',
+    'warm-espresso': 'Neutral',
+    'ivory-parchment': 'Parchment',
+    'pure-light': 'Zinc'
   };
 
   // --- DOM Elements ---
@@ -95,17 +95,16 @@
       .replace(/^-+|-+$/g, '');
   }
 
-  function showToast(message, icon = '✓') {
+  function showToast(message) {
     const toast = document.createElement('div');
     toast.className = 'toast';
-    toast.innerHTML = `<span style="color: var(--accent); font-weight: bold;">${icon}</span> <span>${escapeHtml(message)}</span>`;
+    toast.textContent = message;
     toastContainer.appendChild(toast);
 
     setTimeout(() => {
       toast.style.opacity = '0';
-      toast.style.transform = 'translateY(8px)';
-      setTimeout(() => toast.remove(), 250);
-    }, 2800);
+      setTimeout(() => toast.remove(), 150);
+    }, 2000);
   }
 
   // --- Configure Marked Renderer with Code Block Cards & GFM ---
@@ -134,7 +133,7 @@
     `;
   };
 
-  // Custom Code Block (Studio Card Design)
+  // Custom Code Block (Technical Card Layout)
   renderer.code = function (code, lang) {
     const language = (lang || '').trim().toLowerCase();
 
@@ -205,24 +204,53 @@
 
   // --- KaTeX Pre/Post Processing to Preserve Formulas ---
   function preprocessMath(text) {
+    const codeBlocks = [];
     const mathMap = [];
-    let counter = 0;
+    let codeCounter = 0;
+    let mathCounter = 0;
 
-    // Block math: $$ ... $$
-    text = text.replace(/\$\$([\s\S]+?)\$\$/g, (match, equation) => {
-      const placeholder = `<!--KATEX_BLOCK_${counter}-->`;
-      mathMap.push({ placeholder, equation, display: true });
-      counter++;
+    // 1. Protect Fenced Code Blocks (``` ... ``` or ~~~ ... ~~~)
+    text = text.replace(/(```[\s\S]*?```|~~~[\s\S]*?~~~)/g, (match) => {
+      const placeholder = `<!--CODE_BLOCK_PLACEHOLDER_${codeCounter++}-->`;
+      codeBlocks.push({ placeholder, content: match });
       return placeholder;
     });
 
-    // Inline math: $ ... $ (excluding escaped \$)
-    text = text.replace(/(?<!\\)\$([^\$\n]+?)(?<!\\)\$/g, (match, equation) => {
-      const placeholder = `<!--KATEX_INLINE_${counter}-->`;
-      mathMap.push({ placeholder, equation, display: false });
-      counter++;
+    // 2. Protect Inline Code Spans (`...` or ``...``)
+    text = text.replace(/(`+)([\s\S]*?)\1/g, (match) => {
+      const placeholder = `<!--CODE_SPAN_PLACEHOLDER_${codeCounter++}-->`;
+      codeBlocks.push({ placeholder, content: match });
       return placeholder;
     });
+
+    // 3. Extract Block Display Math ($$...$$ on own line or multiline)
+    text = text.replace(/(?:^|\n)[ \t]*\$\$([^\$]+?)\$\$[ \t]*(?=\r?\n|$)/g, (match, equation) => {
+      const placeholder = `<!--KATEX_BLOCK_${mathCounter}-->`;
+      mathMap.push({ placeholder, equation: equation.trim(), display: true });
+      mathCounter++;
+      return `\n\n${placeholder}\n\n`;
+    });
+
+    // Also handle single-line display math $$...$$
+    text = text.replace(/(?<![\w\\$])\$\$([^\$\n]+?)\$\$(?![\w\$])/g, (match, equation) => {
+      const placeholder = `<!--KATEX_BLOCK_${mathCounter}-->`;
+      mathMap.push({ placeholder, equation: equation.trim(), display: true });
+      mathCounter++;
+      return placeholder;
+    });
+
+    // 4. Extract Inline Math $...$ (strictly adhering to GFM / Pandoc rules)
+    text = text.replace(/(?<![\w\\$])\$([^\s\$](?:[^\$\n]*?[^\s\$\\])?)\$(?![\w\$])/g, (match, equation) => {
+      const placeholder = `<!--KATEX_INLINE_${mathCounter}-->`;
+      mathMap.push({ placeholder, equation: equation.trim(), display: false });
+      mathCounter++;
+      return placeholder;
+    });
+
+    // 5. Restore Protected Code Blocks and Spans using function to avoid $ backreference interpolation
+    for (let i = codeBlocks.length - 1; i >= 0; i--) {
+      text = text.replace(codeBlocks[i].placeholder, () => codeBlocks[i].content);
+    }
 
     return { text, mathMap };
   }
@@ -234,12 +262,14 @@
       try {
         const rendered = window.katex.renderToString(item.equation, {
           displayMode: item.display,
-          throwOnError: false
+          throwOnError: true
         });
         const wrapped = item.display ? `<div class="katex-display">${rendered}</div>` : rendered;
-        html = html.replace(item.placeholder, wrapped);
+        html = html.replace(item.placeholder, () => wrapped);
       } catch (err) {
-        html = html.replace(item.placeholder, `<code>${escapeHtml(item.equation)}</code>`);
+        // Fall back gracefully to original text if KaTeX cannot parse, preventing red error spans
+        const fallback = item.display ? `$$${escapeHtml(item.equation)}$$` : `$${escapeHtml(item.equation)}$`;
+        html = html.replace(item.placeholder, () => fallback);
       }
     });
 
@@ -319,7 +349,7 @@
             `;
           }, 2000);
         } catch (err) {
-          showToast('Failed to copy to clipboard', '✕');
+          showToast('Failed to copy code to clipboard');
         }
       });
     });
@@ -751,13 +781,13 @@
           markdownInput.value = sampleText;
           fileNameBadge.textContent = 'sample.md';
           renderMarkdown();
-          showToast('Sample document loaded');
+          showToast('Specification sample loaded');
           return;
         }
       } catch (e) {
         // Fallback default
       }
-      showToast('Loaded sample', '✓');
+      showToast('Loaded sample document');
     });
 
     // Clear
@@ -766,16 +796,16 @@
       markdownInput.value = '';
       fileNameBadge.textContent = 'untitled.md';
       renderMarkdown();
-      showToast('Editor cleared', '✓');
+      showToast('Editor buffer cleared');
     });
 
     // Copy Raw Markdown
     copyMarkdownBtn.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(markdownInput.value);
-        showToast('Markdown copied to clipboard!');
+        showToast('Markdown copied to clipboard');
       } catch (err) {
-        showToast('Failed to copy', '✕');
+        showToast('Failed to copy text');
       }
     });
 
@@ -814,7 +844,7 @@
         a.download = `${fileNameBadge.textContent.replace(/\.[^/.]+$/, "")}.html`;
         a.click();
         URL.revokeObjectURL(a.href);
-        showToast('HTML file exported!');
+        showToast('HTML file exported');
       } else {
         window.print();
       }

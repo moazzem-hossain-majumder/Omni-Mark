@@ -1,103 +1,87 @@
-# OmniMark — Modern Markdown Reader & Studio 🚀
+# OmniMark
 
-> **A high-fidelity, client-side Markdown reader and live editor engineered for modern technical documents, diagrams, and code.**
+OmniMark is a client-side Markdown editor and preview engine. It compiles CommonMark and GitHub Flavored Markdown (GFM) directly in browser memory, evaluating KaTeX mathematical expressions, Highlight.js code syntax, and Mermaid diagram vectors in real time.
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-omni--mark--zorox.vercel.app-38bdf8?style=for-the-badge&logo=vercel)](https://omni-mark-zorox.vercel.app/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-omni--mark--zorox.vercel.app-2563eb?style=flat-square)](https://omni-mark-zorox.vercel.app/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-neutral.svg?style=flat-square)](LICENSE)
 
-🔗 **Try it live right now:** **[https://omni-mark-zorox.vercel.app/](https://omni-mark-zorox.vercel.app/)**
-
----
-
-## 🎯 The Problem We Solve
-
-Most online Markdown readers were built a decade ago and haven't kept pace with modern developer and researcher workflows. If you've used standard online Markdown viewers, you've likely hit these frustrating roadblocks:
-
-| The Problem with Conventional Readers | How OmniMark Solves It |
-| :--- | :--- |
-| ❌ **Broken Alert Callouts**: Modern documentation uses `> [!NOTE]`, `> [!TIP]`, `> [!WARNING]`. Traditional readers render these as plain, ugly quotes with raw bracketed text. | ✅ **Native Callout Alert Cards**: Renders pixel-perfect alert callouts (`NOTE`, `TIP`, `IMPORTANT`, `WARNING`, `CAUTION`) with dedicated icons, tinted accents, and colored left borders. |
-| ❌ **Unrendered Diagrams**: Pasting `mermaid` flowcharts or sequence diagrams results in a raw text block instead of a visual chart. | ✅ **Real-Time Mermaid SVG Engine**: Dynamically compiles mermaid code blocks into sharp, interactive vector SVG flowcharts directly in the preview. |
-| ❌ **Mangling Mathematical Formulas**: LaTeX equations (`$E=mc^2$` or `$$\int f(x)dx$$`) either don't render or get scrambled by aggressive markdown parsers. | ✅ **KaTeX Math Engine**: Protects mathematical notation from AST mangling and renders crisp scientific formulas at lightning speed. |
-| ❌ **Bare, Impractical Code Blocks**: Code blocks are plain text boxes with no language labels, no line numbers, and no easy way to copy code. | ✅ **Studio Code Cards**: Features top header bars with uppercase language badges and a **1-click animated Copy Code button**. |
-| ❌ **Privacy & Latency Concerns**: Many online editors upload your files to remote servers, causing latency and exposing proprietary specs or private notes. | ✅ **100% Client-Side & Private**: Everything parses in your browser memory via Web APIs. Zero data, keystrokes, or files leave your device. |
-| ❌ **Drifting & Clunky Scrolling**: Split-pane viewers either don't sync or get wildly desynchronized as you scroll through long documents. | ✅ **Proportional Sync Scroll & Resizer**: Synchronized scrolling with a draggable divider gutter and 3 flexible view modes (Split, Editor Only, Reader Only). |
-| ❌ **Eye Fatigue & Rigid Themes**: Most viewers offer only blinding white or harsh pure black. | ✅ **5 Curated Color Themes**: Includes **Obsidian Dark**, **Deep Navy**, **Warm Espresso**, **Ivory Parchment**, and **Pure Light**. |
-| ❌ **Lost in Long Documents**: No quick way to navigate extensive READMEs or API specs. | ✅ **Interactive Table of Contents (TOC)**: Auto-detects headings (H1–H4) with smooth 1-click jump-to-section navigation. |
+Live Deployment: [https://omni-mark-zorox.vercel.app/](https://omni-mark-zorox.vercel.app/)
 
 ---
 
-## 🌟 Key Features
+## Technical Specifications
 
-### 1. Dual-Pane Studio Environment
-- **Left Pane (Editor & Uploader)**:
-  - Drag and drop any `.md`, `.markdown`, or `.txt` file directly onto the editor.
-  - Dedicated **Upload .md** file picker.
-  - Line numbers gutter that synchronizes with vertical scrolling.
-  - Quick formatting toolbar (Bold, Italic, Strikethrough, Headings, Quotes, Code, Tables, Task lists, Callouts).
-  - Keyboard shortcuts (<kbd>Ctrl</kbd>+<kbd>B</kbd>, <kbd>Ctrl</kbd>+<kbd>I</kbd>, <kbd>Ctrl</kbd>+<kbd>K</kbd>, <kbd>Tab</kbd> indent).
-- **Right Pane (Reader View)**:
-  - Responsive typography engineered for readability.
-  - In-document quick text search.
-  - Live document telemetry: words, characters, line count, and estimated reading time.
-- **Draggable Gutter Resizer**: Click and drag the divider between panes to set your preferred width ratio.
-- **View Mode Switcher**: Seamlessly toggle between **Split Screen**, **Editor Only**, or **Reader Only (Distraction-Free Zen Mode)**.
-
-### 2. High-Fidelity Rendering
-- **Callout Alert Blocks**: Full support for `> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]`, and `> [!CAUTION]`.
-- **Code Block Cards**: Complete syntax highlighting powered by Highlight.js supporting JavaScript, TypeScript, Python, Rust, Bash, JSON, SQL, and more.
-- **LaTeX Math (KaTeX)**: Display both inline equations (`$formula$`) and multiline block equations (`$$formula$$`).
-- **Mermaid Diagrams**: Interactive flowcharts, sequence diagrams, and class diagrams rendered as vector SVGs.
-- **GFM Tables & Task Lists**: Zebra striping, responsive horizontal overflow scroll, and interactive task checklists (`- [ ]`, `- [x]`).
-
-### 3. 5 Curated Color Themes
-- 🌌 **Obsidian Dark**: Sleek deep dark mode with crisp borders and azure accents.
-- 🌊 **Deep Navy**: Rich oceanic midnight navy (`#080e1a` / `#0f192e`) with luminous sapphire and sky blue tones.
-- ☕ **Warm Espresso**: Deep charcoal and volcanic stone with warm terracotta accents.
-- 📜 **Ivory Parchment**: Clean warm cream paper finish designed for long-form reading comfort.
-- ☀️ **Pure Light**: Minimalist daylight theme with clean contrast and slate borders.
-
-### 4. Export & Utility
-- **Export to HTML**: Download a standalone, self-contained HTML file.
-- **Print / PDF**: Clean print stylesheet for creating professional PDFs without editor chrome.
-- **Copy Markdown**: One-click raw markdown copy.
+| Component | Engine / Dependency | Processing Details |
+| :--- | :--- | :--- |
+| **Markdown Tokenization** | Marked.js 12.0.2 | Full GFM and CommonMark parsing with custom heading slugification and table wrappers |
+| **Mathematical Formulas** | KaTeX 0.16.10 | Evaluates inline (`$...$`) and block (`$$...$$`) LaTeX expressions with HTML/MathML output |
+| **Diagrams & Flowcharts** | Mermaid.js 10.9.1 | Dynamic SVG graph compilation from fenced `mermaid` code blocks |
+| **Syntax Highlighting** | Highlight.js 11.9.0 | Polyglot tokenizer with language identification for JavaScript, TypeScript, Python, Rust, Bash, JSON, SQL |
+| **Security Sanitization** | DOMPurify 3.1.2 | XSS vector elimination preserving SVG structures and KaTeX MathML trees |
+| **Callout Alerts** | Custom Postprocessor | Maps `> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]`, and `> [!CAUTION]` to semantic containers |
+| **Viewport Synchronization** | Dual-pane scroll engine | Proportional vertical scroll position synchronization between textarea and preview |
 
 ---
 
-## 🚀 Live Demo & Deployment
+## Architecture & Layout
 
-### 🌐 Live URL
-Access the live deployment here: **[https://omni-mark-zorox.vercel.app/](https://omni-mark-zorox.vercel.app/)**
+OmniMark runs completely within browser client memory without server-side rendering or network data transmission.
 
-### 📦 Deploy Your Own Copy on Vercel
-OmniMark is 100% static and zero-config with the included `vercel.json`:
+### 1. Editor Pane
+- Direct textarea input with tab indentation (2 spaces) and line-number gutter synchronization.
+- HTML5 Drag-and-drop file ingestion via the `FileReader` API (supports `.md`, `.markdown`, `.txt`).
+- Keyboard formatting bindings: `Cmd+B` / `Ctrl+B` (Bold), `Cmd+I` / `Ctrl+I` (Italic), `Cmd+K` / `Ctrl+K` (Link).
+- Document telemetry calculation: word count, character count, line count, and estimated reading time at a 200 WPM baseline benchmark.
 
-1. Fork or clone this repository:
-   ```bash
-   git clone https://github.com/moazzem-hossain-majumder/Omni-Mark.git
-   ```
-2. Go to **[vercel.com/new](https://vercel.com/new)** and import your repository.
-3. Keep default settings (**Framework Preset: Other**) and click **Deploy**.
+### 2. Preview Pane
+- Live DOM tree rendering debounced at 120ms for smooth 60fps interaction during continuous typing.
+- Interactive Table of Contents (TOC) drawer generated from document heading nodes (H1–H4) with direct anchor navigation.
+- In-document text filter and highlight walker.
+- Individual code block cards featuring language tags and clipboard copying.
+
+### 3. Display Modes & Themes
+- Three workspace layout modes: Split View, Editor Only, and Preview Only.
+- Monochromatic palettes built on zinc, slate, and neutral color bases with standardized border tokens (`4px` and `6px`).
+- Standalone HTML document export bundling standard styles and compiled output.
 
 ---
 
-## 💻 Local Development
+## Local Development
 
-Clone and run locally in seconds:
+OmniMark requires no build tools or package bundlers to run.
+
+### Prerequisites
+- Any modern web browser (Chrome, Firefox, Safari, Edge).
+- Optional: Node.js (for running a local HTTP server).
+
+### Running Locally
 
 ```bash
 # Clone the repository
 git clone https://github.com/moazzem-hossain-majumder/Omni-Mark.git
 cd Omni-Mark
 
-# Start local server
+# Start local server via npm
 npm start
 ```
 
-Visit **`http://localhost:5173`** in your browser.
-*(You can also directly double-click `index.html` in File Explorer—no build steps or node dependencies required!)*
+Alternatively, open `index.html` directly in any web browser without starting a server.
 
 ---
 
-## 📄 License
+## Deployment
+
+OmniMark is configured for static hosting platforms.
+
+### Vercel Deployment
+
+1. Fork or clone this repository to GitHub.
+2. Import the project into Vercel.
+3. Use the default configuration (`Framework Preset: Other`, output directory: root).
+4. Deploy.
+
+---
+
+## License
 
 This project is licensed under the [MIT License](LICENSE).

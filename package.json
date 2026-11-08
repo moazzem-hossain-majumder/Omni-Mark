@@ -1,7 +1,7 @@
 {
   "name": "omnimark",
   "version": "1.0.0",
-  "description": "A high-fidelity modern Markdown Reader, Live Editor, and Studio",
+  "description": "Client-side Markdown editor and technical document previewer",
   "main": "index.html",
   "scripts": {
     "start": "npx -y serve . -l 5173",
